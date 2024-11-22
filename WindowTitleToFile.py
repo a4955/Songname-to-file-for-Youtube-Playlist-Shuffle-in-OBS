@@ -13,6 +13,14 @@ def get_window_titles():
     window_titles = [(window.title, window._hWnd) for window in windows]
     return window_titles
 
+# Hardcoding to make YTPLR display as N/A when no song is playing
+def YTPLR_display_NA(title):
+    if len(title) < 57:
+        return title
+    if title[:57] =="Randomize/Shuffle YouTube Playlist of up to 10,000 videos":
+        return "N/A"
+    return title
+
 # Truncate the title based on quotation marks, made specifically with YTPLR in mind
 def truncate_title(title):
     first_quote_index = title.find('"')
@@ -25,7 +33,7 @@ def truncate_title(title):
     return title
 
 def write_to_file(title):
-    with open(output_file, 'w') as file:
+    with open(output_file, 'w', encoding='utf-8') as file:
         file.write(title)
 
 # Window tracking is based on HWND
@@ -37,6 +45,10 @@ def track_window(hwnd, label):
             if active_title:
                 truncated_title = truncate_title(active_title)
                 label.config(text=f"Current Window Title: {truncated_title}")
+                
+                truncated_title = YTPLR_display_NA(truncated_title)
+                ##### !!!!! Hardcoded exception for YTPLR site. Comment this line out to display title normally !!!!! #####
+                
                 write_to_file(truncated_title)
                 print(f"Window title updated: {truncated_title}")
             current_title = active_title
